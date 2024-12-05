@@ -10,7 +10,9 @@ from FlaskWebProject import app, db
 from FlaskWebProject.forms import LoginForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
 from FlaskWebProject.models import User, Post
+import os
 import msal
+from msal import SerializableTokenCache
 import uuid
 
 imageSourceUrl = 'https://'+ app.config['BLOB_ACCOUNT']  + '.blob.core.windows.net/' + app.config['BLOB_CONTAINER']  + '/'
@@ -117,12 +119,19 @@ def logout():
     return redirect(url_for('login'))
 
 def _load_cache():
-    # TODO: Load the cache from `msal`, if it exists
-    cache = None
+    cache = SerializableTokenCache()
+    if os.path.exists('token_cache.bin'):
+        cache.deserialize(open('token_cache.bin', 'r').read())
+        app.logger.info('Loaded cache from cache file')
+    else:
+        app.logger.info('No cache file found')
     return cache
 
 def _save_cache(cache):
-    # TODO: Save the cache, if it has changed
+    if cache.has_state_changed:
+        with open('token_cache.bin', 'w') as f:
+            f.write(cache.serialize())
+        app.logger.info('Saved cache to cache file')
     pass
 
 def _build_msal_app(cache=None, authority=None):
@@ -137,3 +146,4 @@ def _build_auth_url(authority=None, scopes=None, state=None):
         state=state or str(uuid.uuid4()),
         redirect_uri=url_for('authorized', _external=True,_scheme='https')
     )
+
