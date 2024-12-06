@@ -29,9 +29,9 @@ class Config(object):
     AUTHORITY = "https://login.microsoftonline.com/common"  # For multi-tenant app, else put tenant name
     #AUTHORITY = "https://login.microsoftonline.com/cmsEntraID"
 
-    CLIENT_ID = "e8a56ef3-66bb-463b-9053-8ec6a0bc7cfd"
+    CLIENT_ID = os.environ.get('CLIENT_ID') or 'e8a56ef3-66bb-463b-9053-8ec6a0bc7cfd'
 
-    REDIRECT_PATH = "/getAToken"  # Used to form an absolute URL; must match to app's redirect_uri set in AAD
+    REDIRECT_PATH = "/pleaseWork"  # Used to form an absolute URL; must match to app's redirect_uri set in AAD
 
     # You can find the proper permission names from this document
     # https://docs.microsoft.com/en-us/graph/permissions-reference
